@@ -1,0 +1,7 @@
+# https://github.com/NVIDIA/gpu-operator/blob/master/deployments/gpu-operator/values.yaml
+dcgmExporter:
+  serviceMonitor:
+    enabled: true
+    interval: 15s
+    honorLabels: false
+    additionalLabels: {}

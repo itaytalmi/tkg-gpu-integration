@@ -1,0 +1,131 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ffmpeg-supply-chain-gpu-demo
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: ffmpeg-supply-chain-gpu-rwx-shared-pvc
+  namespace: ffmpeg-supply-chain-gpu-demo
+  labels:
+    app: ffmpeg-supply-chain-gpu-rwx-shared-pvc
+spec:
+  storageClassName: px-rwx-sc
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 50Gi
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: ffmpeg-supply-chain-gpu
+  namespace: ffmpeg-supply-chain-gpu-demo
+---
+apiVersion: v1
+kind: Secret
+type: kubernetes.io/service-account-token
+metadata:
+  name: ffmpeg-supply-chain-gpu-token
+  namespace: ffmpeg-supply-chain-gpu-demo
+  annotations:
+    kubernetes.io/service-account.name: ffmpeg-supply-chain-gpu
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: ffmpeg-supply-chain-gpu-cluster-role-binding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+subjects:
+- kind: ServiceAccount
+  name: ffmpeg-supply-chain-gpu
+  namespace: ffmpeg-supply-chain-gpu-demo
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: coordinator-service
+  namespace: ffmpeg-supply-chain-gpu-demo
+  labels:
+    app: coordinator-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: coordinator-service
+  template:
+    metadata:
+      labels:
+        app: coordinator-service
+    spec:
+      serviceAccountName: ffmpeg-supply-chain-gpu
+      containers:
+      - image: l02-harbor.cloudnativeapps.cloud/ffmpeg-supply-chain-gpu-demo/coordinator-service:v1.0.0
+        name: coordinator-service
+        args:
+        - /ffmpeg-processing
+        - l02-harbor.cloudnativeapps.cloud/ffmpeg-supply-chain-gpu-demo/ffmpeg:5.1.2-nvidia2004
+        resources: {}
+        volumeMounts:
+          - mountPath: /ffmpeg-processing
+            name: ffmpeg-supply-chain-gpu-rwx-shared-pvc
+      volumes:
+      - name: ffmpeg-supply-chain-gpu-rwx-shared-pvc
+        persistentVolumeClaim:
+          claimName: ffmpeg-supply-chain-gpu-rwx-shared-pvc
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: repository-service
+  namespace: ffmpeg-supply-chain-gpu-demo
+  labels:
+    app: repository-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: repository-service
+  template:
+    metadata:
+      labels:
+        app: repository-service
+    spec:
+      containers:
+      - image: l02-harbor.cloudnativeapps.cloud/ffmpeg-supply-chain-gpu-demo/simple-upload-server:latest
+        name: simple-upload-server
+        ports:
+          - containerPort: 25478
+        args:
+        - -token
+        - SoMuchForSecurity
+        - -upload_limit
+        - '524288000000000'
+        - /ffmpeg-processing
+        resources: {}
+        volumeMounts:
+          - mountPath: /ffmpeg-processing
+            name: ffmpeg-supply-chain-gpu-rwx-shared-pvc
+      volumes:
+      - name: ffmpeg-supply-chain-gpu-rwx-shared-pvc
+        persistentVolumeClaim:
+          claimName: ffmpeg-supply-chain-gpu-rwx-shared-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: repository-service
+  namespace: ffmpeg-supply-chain-gpu-demo
+spec:
+  type: LoadBalancer
+  selector:
+    app: repository-service
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 25478

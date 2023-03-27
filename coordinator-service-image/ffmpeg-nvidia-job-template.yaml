@@ -1,0 +1,41 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: ffmpeg-nvidia-${RANDOM_JOB_ID}
+  namespace: ffmpeg-supply-chain-gpu-demo
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: ffmpeg-nvidia
+        image: ${FFMPEG_IMAGE}
+        args:
+        - -y
+        - -hwaccel
+        - cuda
+        - -hwaccel_output_format
+        - cuda
+        - -extra_hw_frames
+        - '8'
+        - -i
+        - ${WORK_DIR}/${TARGET_FILE}
+        - -c:a
+        - copy
+        - -c:v
+        - h264_nvenc
+        - -b:v
+        - 5M
+        - -preset
+        - fast
+        - ${WORK_DIR}/${FILE_NO_EXT}_processed-output.mkv
+        resources:
+          limits:
+            nvidia.com/gpu: "1" # Requesting 1 GPU
+        volumeMounts:
+          - mountPath: /ffmpeg-processing
+            name: ffmpeg-supply-chain-gpu-rwx-shared-pvc
+      volumes:
+      - name: ffmpeg-supply-chain-gpu-rwx-shared-pvc
+        persistentVolumeClaim:
+          claimName: ffmpeg-supply-chain-gpu-rwx-shared-pvc

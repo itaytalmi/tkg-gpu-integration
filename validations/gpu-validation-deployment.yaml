@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: gpu-validation
+  name: gpu-validation
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gpu-validation
+  template:
+    metadata:
+      labels:
+        app: gpu-validation
+    spec:
+      containers:
+      # https://hub.docker.com/r/nvidia/cuda/tags
+      - image: nvidia/cuda:12.1.0-base-ubuntu20.04
+        name: 12-1-0-base-ubuntu20-04-nwr9r
+        command:
+        - sleep
+        - '9999'
+        resources:
+          limits:
+            nvidia.com/gpu: "1" # Requesting 1 GPU

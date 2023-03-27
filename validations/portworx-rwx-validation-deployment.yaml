@@ -1,0 +1,43 @@
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: nginx-pvc
+  labels:
+    app: nginx-pvc
+spec:
+  storageClassName: px-rwx-sc
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx
+  labels:
+    app: nginx
+spec:
+  selector:
+    matchLabels:
+      app: nginx-pvc
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: nginx-pvc
+    spec:
+      containers:
+      - name: nginx
+        image: nginxinc/nginx-unprivileged
+        ports:
+          - containerPort: 8080
+        volumeMounts:
+          - mountPath: /var/www/html
+            name: nginx-pvc
+      volumes:
+      - name: nginx-pvc
+        persistentVolumeClaim:
+          claimName: nginx-pvc
