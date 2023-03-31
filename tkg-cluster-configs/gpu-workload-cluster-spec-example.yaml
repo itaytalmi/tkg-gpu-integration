@@ -85,7 +85,7 @@ spec:
         folder: /Main/vm/LABS/itay/l02/tkg/workload-clusters
         network: /Main/network/itay-k8s-nodes
         resourcePool: /Main/host/LAB-V3/Resources/US
-        server: ts-vc-01.terasky.local
+        server: vcsa.cloudnativeapps.blog
         storagePolicyID: k8s-storage-policy-vsan
         template: /Main/vm/LABS/itay/l01/tkg/templates/ubuntu-2004-efi-kube-v1.24.10+vmware.1
         tlsThumbprint: ""
