@@ -3,7 +3,7 @@ kind: ClusterBootstrap
 metadata:
   annotations:
     tkg.tanzu.vmware.com/add-missing-fields-from-tkr: v1.24.10---vmware.1-tkg.2
-  name: l02-tkg-wld-gpu
+  name: tkg-wld-gpu-cls
   namespace: default
 spec:
   additionalPackages:
@@ -21,11 +21,11 @@ spec:
 apiVersion: v1
 kind: Secret
 metadata:
-  name: l02-tkg-wld-gpu
+  name: tkg-wld-gpu-cls
   namespace: default
 stringData:
-  password: <REDACTED>
-  username: <REDACTED>
+  username: your-vsphere-username
+  password: your-vsphere-password
 ---
 apiVersion: cluster.x-k8s.io/v1beta1
 kind: Cluster
@@ -34,8 +34,8 @@ metadata:
     osInfo: ubuntu,20.04,amd64
     tkg/plan: dev
   labels:
-    tkg.tanzu.vmware.com/cluster-name: l02-tkg-wld-gpu
-  name: l02-tkg-wld-gpu
+    tkg.tanzu.vmware.com/cluster-name: tkg-wld-gpu-cls
+  name: tkg-wld-gpu-cls
   namespace: default
 spec:
   clusterNetwork:
@@ -47,6 +47,7 @@ spec:
       - 100.64.0.0/13
   topology:
     class: tkg-vsphere-default-v1.0.0
+    version: v1.24.10+vmware.1-tkg.2
     controlPlane:
       metadata:
         annotations:
@@ -65,7 +66,7 @@ spec:
     - name: trust
       value:
         additionalTrustedCAs:
-        - data: LS0tLS1CRUdJTiBDRVJU...
+        - data: LS0tLS1CRUdJTiBDRVJ...
           name: proxy
     - name: podSecurityStandard
       value:
@@ -84,14 +85,14 @@ spec:
         folder: /Main/vm/LABS/itay/l02/tkg/workload-clusters
         network: /Main/network/itay-k8s-nodes
         resourcePool: /Main/host/LAB-V3/Resources/US
-        server: vcsa.cloudnativeapps.cloud
+        server: ts-vc-01.terasky.local
         storagePolicyID: k8s-storage-policy-vsan
         template: /Main/vm/LABS/itay/l01/tkg/templates/ubuntu-2004-efi-kube-v1.24.10+vmware.1
         tlsThumbprint: ""
     - name: user
       value:
         sshAuthorizedKeys:
-        - ssh-rsa AAAAB3NzaC1yc2EAAAAD...
+        - ssh-rsa AAAAB3Nz...
     - name: controlPlane
       value:
         machine:
@@ -102,22 +103,11 @@ spec:
       value:
         count: 1
         machine:
-          customVMXKeys:
-            pciPassthru.64bitMMIOSizeGB: "16"
-            pciPassthru.RelaxACSforP2P: "true"
-            pciPassthru.allowP2P: "true"
-            pciPassthru.use64bitMMIO: "true"
           diskGiB: 300
           memoryMiB: 16384
           numCPUs: 4
     - name: pci
-      value:
-        worker:
-          devices:
-          - deviceId: 7864
-            vendorId: 4318
-          hardwareVersion: vmx-17
-    version: v1.24.10+vmware.1-tkg.2
+      value: {}
     workers:
       machineDeployments:
       - class: tkg-worker
@@ -126,3 +116,34 @@ spec:
             run.tanzu.vmware.com/resolve-os-image: image-type=ova,os-name=ubuntu
         name: md-0
         replicas: 1
+      - class: tkg-worker
+        metadata:
+          annotations:
+            run.tanzu.vmware.com/resolve-os-image: image-type=ova,os-name=ubuntu
+        name: md-1-gpu
+        replicas: 1
+        variables:
+          overrides:
+          - name: worker
+            value:
+              count: 1
+              machine:
+                customVMXKeys:
+                  pciPassthru.64bitMMIOSizeGB: "16"
+                  pciPassthru.RelaxACSforP2P: "true"
+                  pciPassthru.allowP2P: "true"
+                  pciPassthru.use64bitMMIO: "true"
+                diskGiB: 300
+                memoryMiB: 16384
+                numCPUs: 4
+          - name: nodePoolLabels
+            value:
+            - key: gpu
+              value: "true"
+          - name: pci
+            value:
+              worker:
+                devices:
+                - deviceId: 7864
+                  vendorId: 4318
+                hardwareVersion: vmx-17
