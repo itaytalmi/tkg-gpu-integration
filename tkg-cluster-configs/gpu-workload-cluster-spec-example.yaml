@@ -2,7 +2,7 @@ apiVersion: run.tanzu.vmware.com/v1alpha3
 kind: ClusterBootstrap
 metadata:
   annotations:
-    tkg.tanzu.vmware.com/add-missing-fields-from-tkr: v1.24.10---vmware.1-tkg.2
+    tkg.tanzu.vmware.com/add-missing-fields-from-tkr: v1.25.7---vmware.2-tkg.1-rc.1
   name: tkg-wld-gpu-cls
   namespace: default
 spec:
@@ -24,8 +24,8 @@ metadata:
   name: tkg-wld-gpu-cls
   namespace: default
 stringData:
-  username: your-vsphere-username
-  password: your-vsphere-password
+  username: itay@vsphere.local
+  password: VMware1!
 ---
 apiVersion: cluster.x-k8s.io/v1beta1
 kind: Cluster
@@ -47,7 +47,7 @@ spec:
       - 100.64.0.0/13
   topology:
     class: tkg-vsphere-default-v1.0.0
-    version: v1.24.10+vmware.1-tkg.2
+    version: v1.25.7+vmware.2-tkg.1-rc.1
     controlPlane:
       metadata:
         annotations:
@@ -66,7 +66,7 @@ spec:
     - name: trust
       value:
         additionalTrustedCAs:
-        - data: LS0tLS1CRUdJTiBDRVJ...
+        - data: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURkekNDQWwrZ0F3SUJBZ0lRSDR3TmRUaEtDSnBPdjhLMUx6UDdzREFOQmdrcWhraUc5dzBCQVFzRkFEQk8KTVJVd0V3WUtDWkltaVpQeUxHUUJHUllGYkc5allXd3hGekFWQmdvSmtpYUprL0lzWkFFWkZnZDBaWEpoYzJ0NQpNUnd3R2dZRFZRUURFeE4wWlhKaGMydDVMVXhCUWkxQlJEQXhMVU5CTUI0WERURTRNVEl5TURFME5UVTBORm9YCkRUTXpNVEl5TURFMU1EVTBNMW93VGpFVk1CTUdDZ21TSm9tVDhpeGtBUmtXQld4dlkyRnNNUmN3RlFZS0NaSW0KaVpQeUxHUUJHUllIZEdWeVlYTnJlVEVjTUJvR0ExVUVBeE1UZEdWeVlYTnJlUzFNUVVJdFFVUXdNUzFEUVRDQwpBU0l3RFFZSktvWklodmNOQVFFQkJRQURnZ0VQQURDQ0FRb0NnZ0VCQUxWWHAwUlhyT09DZmRVZElUNmF1aDU0CmFTNXN2STNPVml0VGVmUFFiRTQxd0U0Y1FRNll6SDB2cnQ3QjZscnlMSFF0L0VROGxVVTNQTEdEOU4rT25rWWwKa2tKcmZTZ2FTMHlLU3htaXJkaFlRNHZ6Z3psL2hyRXMxZkFQWVo2NkUra3lBc29aQTRsQnZrR0wxNFZ3MVNBMAo5TkV3eTlqOTZsOU9WdFlQcDV4R1c0SWJGZHdLMk96bW9SWFFGRmdBd3JlQkdOS2l0M3BJZkRPby82bWZxZTVXCnFYNUNZbGNVOXJjR3VzWnBoc0U0WTVkS1FRelF2dFMwOUxnSEZlNjA2Wm5QMXUyc1FUdFp2VzdUSzBDYW81ZnMKUkF4T0NmS1ZzZ1Z1SVVNbUhKd0lRK2x4MEdQS3ppVWx6K2F0Qm05Z09UWXBjZmQzcFlQMUJPQnBOTzROUTk4QwpBd0VBQWFOUk1FOHdDd1lEVlIwUEJBUURBZ0dHTUE4R0ExVWRFd0VCL3dRRk1BTUJBZjh3SFFZRFZSME9CQllFCkZISE4rVlp6L1hGR0JJZEZmOEV6UnYyNnd1WFFNQkFHQ1NzR0FRUUJnamNWQVFRREFnRUFNQTBHQ1NxR1NJYjMKRFFFQkN3VUFBNElCQVFCS2pFQlJRSERzY01aZnBhVEJmRDhLcjBMU2dpbnJzU0JNWmtiUHdMMmt1bTlPdVM5RgpzVVZQOEd4OVc3dDBJdzMveGFHN01qL1ZOUDVHSDVVNFAzUW56dXRRMUo5L1Vsb1hrRThlZHlqYlEvUzVLeFU4CjBERFBZSXk2aTdBR09nR3RuYm4zbDZabEtXd0R5cGQzVFcwVFEwVVFObTlqNFhuTm9vM0xwbTFpV3NKVFRCMGwKbFdNZVNxMzZOeHAyTzlZcnh6amhxdnRLTmZKNjAzY0gycVlMK1UvZ0V4OEp1VGVLdEpQOTI3bnNqSlUzbGltegpYSzFjdndxQlpSbEFXcGd0RGxRSWw4U3B1Nnc2TDJBaWdVdHg0ZjhZMFFWV29EWEw3dmxXN1JxSlQ0THpCUlRzCkl5MUdGVjlxdnF3NFdlTWs3TXl2QWRrM3d3Vy9nQ01RY1BzSAotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg==
           name: proxy
     - name: podSecurityStandard
       value:
@@ -85,14 +85,14 @@ spec:
         folder: /Main/vm/LABS/itay/l02/tkg/workload-clusters
         network: /Main/network/itay-k8s-nodes
         resourcePool: /Main/host/LAB-V3/Resources/US
-        server: vcsa.cloudnativeapps.cloud
+        server: ts-vc-01.terasky.local
         storagePolicyID: k8s-storage-policy-vsan
-        template: /Main/vm/LABS/itay/l01/tkg/templates/ubuntu-2004-efi-kube-v1.24.10+vmware.1
+        # template: /Main/vm/LABS/itay/l01/tkg/templates/ubuntu-2004-efi-kube-v1.24.10+vmware.1
         tlsThumbprint: ""
     - name: user
       value:
         sshAuthorizedKeys:
-        - ssh-rsa AAAAB3Nz...
+        - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC6TPWbdTQQGQzypvuhYCdUK0ZEnjgaCi0ilQbgHlgiicAFG6Nlw5NqBi7UtYm5fFurzQ4sNHl5ysgQM9lIODHt/RsdL0hZFjxpnQGRpHZU856s8DKbGuv7Sm/7M8E7oQxqWqzlhwauddFCI+wy6jVxAZhFpFraM5kcP7bPNUnRwb70hatxgeDvHrDjwO/qPIu6i9E5bGwCMJ8dvOS3Ujv//YuLh2IRecPZoFqLF98nxXOHCX38lPikEtzd7sLf3t+rRYOMlJVgkBz5URbM0VWvHgeXSvBiGogxVrDD8PLDfUPJ01v4WoC+hxkq0F8YwfQcCNi4vYzZKEDgauzs+TWbG0jnZ2SSw3vIgUPsgn+W+8PBrQne5YaNRUzpGNhk9VkhTPsPhSuis6B1sxpJ+m5jZdNw1LxkEKclslN5jbFfBviSuLMNi7jbzfFJeGJxAqyMxlblGyxnt/FlqSkmS5Owjsqz1UNtJFfoqhz73VApLzaG379CjX3Z2TX2zMgWjec= k8s@it-mgmt-lin.terasky.lab
     - name: controlPlane
       value:
         machine:
